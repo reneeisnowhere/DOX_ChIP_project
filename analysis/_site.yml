@@ -9,6 +9,10 @@ navbar:
     href: about.html
   - text: License
     href: license.html
+right:
+  - icon: fab fa-github
+    text: Source code
+    href: https://github.com/reneeisnowhere/DOX_ChIP_project
 output:
   workflowr::wflow_html:
     toc: yes
