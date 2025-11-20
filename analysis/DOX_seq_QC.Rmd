@@ -26,4 +26,123 @@ pre[class] {
 ```
 
 
-testing
+Library loading
+
+```{r package loading}
+library(tidyverse)
+
+```
+
+
+```{r data import}
+
+DOX_ChIP_samplenames <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/DOX_ChIP_samplenames.txt", 
+    delim = "\t", escape_double = FALSE, 
+    trim_ws = TRUE)
+
+Lane1_fastqc <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/seperate_multiqc/Lane1/multiqc/multiqc_data/multiqc_fastqc.txt")
+Lane1_genstat <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/seperate_multiqc/Lane1/multiqc/multiqc_data/multiqc_general_stats.txt")
+
+Lane2_fastqc <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/seperate_multiqc/Lane2/multiqc/multiqc_data/multiqc_fastqc.txt")
+Lane2_genstat <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/seperate_multiqc/Lane2/multiqc/multiqc_data/multiqc_general_stats.txt")
+
+Merged_fastqc <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/merged_multiqc/multiqc/multiqc_data/multiqc_fastqc.txt")
+Merged_genstat <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/merged_multiqc/multiqc/multiqc_data/multiqc_general_stats.txt")
+
+```
+
+
+## Initial QC before cut-adapt
+
+```{r process fastqc}
+
+process_fastqc <- function(fastqc_df, samplenames_df){
+  fastqc_df %>% 
+  dplyr::select(Sample,`Total Sequences`:avg_sequence_length) %>% 
+  separate(Sample, 
+           into = c("Sample_name","read"), 
+           sep="_(?=[^_]+$)", ## this separates based on last underscore!)
+           remove= FALSE,
+           extra = "merge") %>% 
+  left_join(samplenames_df, by=c("Sample_name"="Sample name"))
+}
+
+```
+
+### First Run QC
+
+```{r first run qc, fig.height=6}
+
+Lane1_qc <- process_fastqc(Lane1_fastqc,DOX_ChIP_samplenames)
+
+Lane1_qc %>% 
+  ggplot(.,aes(x=Sample_name, y=`Total Sequences`))+
+  geom_col(aes(fill=Ab))+
+  theme_bw()+
+   theme(axis.text.x=element_text(vjust= .2,angle=90))+
+  # facet_wrap(~read, nrow=2, ncol=1)+
+  ggtitle("Number of seqences per sample, R1+R2\nFirst run")
+
+Lane1_qc %>% 
+    ggplot(.,aes(x=Sample_name, y=100-total_deduplicated_percentage))+
+  geom_col(aes(fill=Ab))+
+  theme_bw()+
+   theme(axis.text.x=element_text(vjust= .2,angle=90))+
+  facet_wrap(~read, nrow=2, ncol=1)+
+  ggtitle("Percent duplication by sample,\nFirst run")+
+  ylab("Pecentage Duplicates")+
+  xlab("Sample")
+
+```
+
+### Second Run QC
+
+```{r second run qc, fig.height=6}
+
+Lane2_qc <- process_fastqc(Lane2_fastqc,DOX_ChIP_samplenames)
+
+Lane2_qc %>% 
+  ggplot(.,aes(x=Sample_name, y=`Total Sequences`))+
+  geom_col(aes(fill=Ab))+
+  theme_bw()+
+   theme(axis.text.x=element_text(vjust= .2,angle=90))+
+  # facet_wrap(~read, nrow=2, ncol=1)+
+  ggtitle("Number of seqences per sample, R1+R2\nSecond run")
+
+Lane2_qc %>% 
+    ggplot(.,aes(x=Sample_name, y=100-total_deduplicated_percentage))+
+  geom_col(aes(fill=Ab))+
+  theme_bw()+
+   theme(axis.text.x=element_text(vjust= .2,angle=90))+
+  facet_wrap(~read, nrow=2, ncol=1)+
+  ggtitle("Percent duplication by sample,\nSecond run")+
+  ylab("Pecentage Duplicates")+
+  xlab("Sample")
+
+```
+
+### Merged Runs QC
+
+```{r Merged run qc, fig.height=6}
+
+Merge_qc <- process_fastqc(Merged_fastqc,DOX_ChIP_samplenames)
+
+Merge_qc %>% 
+  ggplot(.,aes(x=Sample_name, y=`Total Sequences`))+
+  geom_col(aes(fill=Ab))+
+  theme_bw()+
+   theme(axis.text.x=element_text(vjust= .2,angle=90))+
+  # facet_wrap(~read, nrow=2, ncol=1)+
+  ggtitle("Number of seqences per sample, R1+R2\nMerged Runs")
+
+Merge_qc %>% 
+    ggplot(.,aes(x=Sample_name, y=100-total_deduplicated_percentage))+
+  geom_col(aes(fill=Ab))+
+  theme_bw()+
+   theme(axis.text.x=element_text(vjust= .2,angle=90))+
+  facet_wrap(~read, nrow=2, ncol=1)+
+  ggtitle("Percent duplication by sample,\nMerged Runs")+
+  ylab("Pecentage Duplicates")+
+  xlab("Sample")
+
+```
