@@ -49,6 +49,9 @@ Lane2_genstat <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/seperat
 Merged_fastqc <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/merged_multiqc/multiqc/multiqc_data/multiqc_fastqc.txt")
 Merged_genstat <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/merged_multiqc/multiqc/multiqc_data/multiqc_general_stats.txt")
 
+cutadapt_fastqc <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/cut-adapt_qc/multiqc/multiqc_data/multiqc_fastqc.txt")
+cutadapt_genstat <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/cut-adapt_qc/multiqc/multiqc_data/multiqc_general_stats.txt")
+
 ```
 
 
@@ -64,9 +67,14 @@ process_fastqc <- function(fastqc_df, samplenames_df){
            sep="_(?=[^_]+$)", ## this separates based on last underscore!)
            remove= FALSE,
            extra = "merge") %>% 
-  left_join(samplenames_df, by=c("Sample_name"="Sample name"))
+  left_join(samplenames_df, by=c("Sample_name"="Sample name")) %>% 
+    mutate(Ab=factor(Ab,levels = c("CTCF","RAD21","TOP2B","p53","Input_P53")))
 }
 
+my_levels=c("CTCF","RAD21","TOP2B","p53","Input_P53")
+
+my_colors=c(CTCF="blue",RAD21="purple",TOP2B="red",p53="violet",Input_P53="pink")
+pd <- position_dodge(width = 0.75)
 ```
 
 ### First Run QC
@@ -76,22 +84,49 @@ process_fastqc <- function(fastqc_df, samplenames_df){
 Lane1_qc <- process_fastqc(Lane1_fastqc,DOX_ChIP_samplenames)
 
 Lane1_qc %>% 
-  ggplot(.,aes(x=Sample_name, y=`Total Sequences`))+
-  geom_col(aes(fill=Ab))+
+  ggplot(.,aes(x=Sample_name, y=`Total Sequences` ))+
+  geom_col(aes(fill=Ab,group=Ab))+
   theme_bw()+
    theme(axis.text.x=element_text(vjust= .2,angle=90))+
   # facet_wrap(~read, nrow=2, ncol=1)+
-  ggtitle("Number of seqences per sample, R1+R2\nFirst run")
+  ggtitle("Number of sequences per sample, R1+R2\nFirst run")+
+  scale_fill_manual(values=my_colors, drop = FALSE)
+
+Lane1_qc %>% 
+  ggplot(.,aes(x=Tx, y=`Total Sequences` ))+
+  geom_boxplot(aes(fill=Ab))+
+  geom_point(aes(group = Ab), 
+             position = pd,
+             size = 2, alpha = 0.8) +
+  theme_bw()+
+   theme(axis.text.x=element_text(vjust= .2,angle=90))+
+  # facet_wrap(~read, nrow=2, ncol=1)+
+  ggtitle("Number of sequences per sample, R1+R2\nFirst run")+
+  scale_fill_manual(values=my_colors, drop = FALSE)
+
 
 Lane1_qc %>% 
     ggplot(.,aes(x=Sample_name, y=100-total_deduplicated_percentage))+
-  geom_col(aes(fill=Ab))+
+  geom_col(aes(fill=Ab,group=Ab))+
   theme_bw()+
    theme(axis.text.x=element_text(vjust= .2,angle=90))+
   facet_wrap(~read, nrow=2, ncol=1)+
   ggtitle("Percent duplication by sample,\nFirst run")+
   ylab("Pecentage Duplicates")+
-  xlab("Sample")
+  xlab("Sample")+
+   scale_fill_manual(values=my_colors, drop = FALSE)
+
+
+Lane1_qc %>% 
+    ggplot(.,aes(x=Tx, y=100-total_deduplicated_percentage))+
+  geom_boxplot(aes(fill=Ab))+
+  theme_bw()+
+   theme(axis.text.x=element_text(vjust= .2,angle=90))+
+  facet_wrap(~read, nrow=2, ncol=1)+
+  ggtitle("Percent duplication by sample,\nFirst run by Treatment")+
+  ylab("Pecentage Duplicates")+
+  xlab("Treatment")+
+  scale_fill_manual(values=my_colors, drop = FALSE)
 
 ```
 
@@ -103,21 +138,47 @@ Lane2_qc <- process_fastqc(Lane2_fastqc,DOX_ChIP_samplenames)
 
 Lane2_qc %>% 
   ggplot(.,aes(x=Sample_name, y=`Total Sequences`))+
-  geom_col(aes(fill=Ab))+
+  geom_col(aes(fill=Ab,group=Ab))+
   theme_bw()+
    theme(axis.text.x=element_text(vjust= .2,angle=90))+
   # facet_wrap(~read, nrow=2, ncol=1)+
-  ggtitle("Number of seqences per sample, R1+R2\nSecond run")
+  ggtitle("Number of sequences per sample, R1+R2\nSecond run")+
+   scale_fill_manual(values=my_colors, drop = FALSE)
+
+Lane2_qc %>% 
+  ggplot(.,aes(x=Tx, y=`Total Sequences` ))+
+  geom_boxplot(aes(fill=Ab))+
+  geom_point(aes(group = Ab), 
+             position = pd,
+             size = 2, alpha = 0.8) +
+  theme_bw()+
+   theme(axis.text.x=element_text(vjust= .2,angle=90))+
+  # facet_wrap(~read, nrow=2, ncol=1)+
+  ggtitle("Number of sequences per sample, R1+R2\nSecond run")+
+  scale_fill_manual(values=my_colors, drop = FALSE)
 
 Lane2_qc %>% 
     ggplot(.,aes(x=Sample_name, y=100-total_deduplicated_percentage))+
-  geom_col(aes(fill=Ab))+
+  geom_col(aes(fill=Ab,group=Ab))+
   theme_bw()+
    theme(axis.text.x=element_text(vjust= .2,angle=90))+
   facet_wrap(~read, nrow=2, ncol=1)+
   ggtitle("Percent duplication by sample,\nSecond run")+
   ylab("Pecentage Duplicates")+
-  xlab("Sample")
+  xlab("Sample")+
+   scale_fill_manual(values=my_colors, drop = FALSE)
+
+Lane2_qc %>% 
+    ggplot(.,aes(x=Tx, y=100-total_deduplicated_percentage))+
+  geom_boxplot(aes(fill=Ab))+
+  theme_bw()+
+   theme(axis.text.x=element_text(vjust= .2,angle=90))+
+  facet_wrap(~read, nrow=2, ncol=1)+
+  ggtitle("Percent duplication by sample,\nSecond run by Treatment")+
+  ylab("Pecentage Duplicates")+
+  xlab("Treatment")+
+  scale_fill_manual(values=my_colors, drop = FALSE)
+
 
 ```
 
@@ -133,7 +194,21 @@ Merge_qc %>%
   theme_bw()+
    theme(axis.text.x=element_text(vjust= .2,angle=90))+
   # facet_wrap(~read, nrow=2, ncol=1)+
-  ggtitle("Number of seqences per sample, R1+R2\nMerged Runs")
+  ggtitle("Number of sequences per sample, R1+R2\nMerged Runs")+
+  scale_fill_manual(values=my_colors, drop = FALSE)
+
+Merge_qc %>% 
+  ggplot(.,aes(x=Tx, y=`Total Sequences` ))+
+  geom_boxplot(aes(fill=Ab))+
+  geom_point(aes(group = Ab), 
+             position = pd,
+             size = 2, alpha = 0.8) +
+  theme_bw()+
+   theme(axis.text.x=element_text(vjust= .2,angle=90))+
+  # facet_wrap(~read, nrow=2, ncol=1)+
+  ggtitle("Number of sequences per sample, R1+R2\nMerged Runs")+
+  scale_fill_manual(values=my_colors, drop = FALSE)
+
 
 Merge_qc %>% 
     ggplot(.,aes(x=Sample_name, y=100-total_deduplicated_percentage))+
@@ -143,6 +218,102 @@ Merge_qc %>%
   facet_wrap(~read, nrow=2, ncol=1)+
   ggtitle("Percent duplication by sample,\nMerged Runs")+
   ylab("Pecentage Duplicates")+
-  xlab("Sample")
+  xlab("Sample")+
+  scale_fill_manual(values=my_colors, drop = FALSE)
+
+
+
+Merge_qc %>% 
+    ggplot(.,aes(x=Tx, y=100-total_deduplicated_percentage))+
+  geom_boxplot(aes(fill=Ab))+
+  theme_bw()+
+   theme(axis.text.x=element_text(vjust= .2,angle=90))+
+  facet_wrap(~read, nrow=2, ncol=1)+
+  ggtitle("Percent duplication by sample,\nMerged Runs by Treatment")+
+  ylab("Pecentage Duplicates")+
+  xlab("Treatment")+
+  scale_fill_manual(values=my_colors, drop = FALSE)
 
 ```
+```{r}
+Merge_qc %>% 
+  group_by(Ab) %>% 
+  summarise(
+    max_seq  = max(`Total Sequences`, na.rm = TRUE),
+    mean_seq = mean(`Total Sequences`, na.rm = TRUE),
+    min_seq = min(`Total Sequences`,na.rm = TRUE)
+  )
+
+Merge_qc %>% 
+  group_by(Ab) %>% 
+  summarise(
+    max_seq  = max(100-total_deduplicated_percentage, na.rm = TRUE),
+    mean_seq = mean(100-total_deduplicated_percentage, na.rm = TRUE),
+    min_seq = min(100-total_deduplicated_percentage,na.rm = TRUE)
+  )
+```
+### Trimmed Runs QC
+```{r cutadapt qc}
+
+cutadapt_qc <- cutadapt_fastqc %>% 
+  dplyr::select(Sample,`Total Sequences`:avg_sequence_length) %>% 
+  separate(Sample, 
+           into = c("Sample_name","read"), 
+           sep = "_(?=[^_]+_[^_]+$)"
+, ## this separates based on last underscore!)
+           remove= FALSE,
+           extra = "merge") %>% 
+   mutate(read = sub("_trim$", "", read)) %>% 
+  left_join(DOX_ChIP_samplenames, by=c("Sample_name"="Sample name")) %>% 
+    mutate(Ab=factor(Ab,levels = c("CTCF","RAD21","TOP2B","p53","Input_P53")))
+
+
+
+cutadapt_qc %>% 
+  ggplot(.,aes(x=Sample_name, y=`Total Sequences`))+
+  geom_col(aes(fill=Ab))+
+  theme_bw()+
+   theme(axis.text.x=element_text(vjust= .2,angle=90))+
+  # facet_wrap(~read, nrow=2, ncol=1)+
+  ggtitle("Number of sequences per sample, R1+R2\nTrimmed Runs")+
+  scale_fill_manual(values=my_colors, drop = FALSE)
+
+cutadapt_qc %>% 
+  ggplot(.,aes(x=Tx, y=`Total Sequences` ))+
+  geom_boxplot(aes(fill=Ab))+
+  geom_point(aes(group = Ab), 
+             position = pd,
+             size = 2, alpha = 0.8) +
+  theme_bw()+
+   theme(axis.text.x=element_text(vjust= .2,angle=90))+
+  # facet_wrap(~read, nrow=2, ncol=1)+
+  ggtitle("Number of sequences per sample, R1+R2\nTrimmed Runs")+
+  scale_fill_manual(values=my_colors, drop = FALSE)
+
+
+cutadapt_qc %>% 
+    ggplot(.,aes(x=Sample_name, y=100-total_deduplicated_percentage))+
+  geom_col(aes(fill=Ab))+
+  theme_bw()+
+   theme(axis.text.x=element_text(vjust= .2,angle=90))+
+  facet_wrap(~read, nrow=2, ncol=1)+
+  ggtitle("Percent duplication by sample,\nTrimmed Runs")+
+  ylab("Pecentage Duplicates")+
+  xlab("Sample")+
+  scale_fill_manual(values=my_colors, drop = FALSE)
+
+
+
+cutadapt_qc %>% 
+    ggplot(.,aes(x=Tx, y=100-total_deduplicated_percentage))+
+  geom_boxplot(aes(fill=Ab))+
+  theme_bw()+
+   theme(axis.text.x=element_text(vjust= .2,angle=90))+
+  facet_wrap(~read, nrow=2, ncol=1)+
+  ggtitle("Percent duplication by sample,\nTrimmed Runs by Treatment")+
+  ylab("Pecentage Duplicates")+
+  xlab("Treatment")+
+  scale_fill_manual(values=my_colors, drop = FALSE)
+
+```
+
