@@ -12,7 +12,7 @@ navbar:
 right:
   - icon: fab fa-github
     text: Source code
-    href: https://github.com/reneeisnowhere/DOX_ChIP_project
+    href: https://github.com/reneeisnowhere/DOX_ChIP_project/index.html
 output:
   workflowr::wflow_html:
     toc: yes
