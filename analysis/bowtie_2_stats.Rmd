@@ -1,0 +1,116 @@
+---
+title: "Bowtie2 results"
+author: "Renee Matthews"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE,
+	dev = c("png","pdf")
+)
+```
+
+```{css, echo=FALSE}
+pre {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 400px;
+}
+```
+
+
+```{r}
+library(tidyverse)
+library(readr)
+```
+
+```{r loading mapping stat files}
+DOX_ChIP_samplenames <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/DOX_ChIP_samplenames.txt", 
+    delim = "\t", escape_double = FALSE, 
+    trim_ws = TRUE)
+set1_parsed <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/mapping_stats/set1_parsed.tsv", 
+    delim = "\t", escape_double = FALSE, 
+    trim_ws = TRUE)
+set2_parsed <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/mapping_stats/set2_parsed.tsv", 
+    delim = "\t", escape_double = FALSE, 
+    trim_ws = TRUE)
+set3_parsed <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/mapping_stats/set3_parsed.tsv", 
+    delim = "\t", escape_double = FALSE, 
+    trim_ws = TRUE)
+
+
+Mapping_stats_combo <-
+set1_parsed %>% 
+  bind_rows(.,set2_parsed) %>%  
+  bind_rows(.,set3_parsed) %>% 
+  left_join(., DOX_ChIP_samplenames, by =c("sample_name"="Sample name")) %>% 
+  mutate(total_reads=total_reads*2)
+
+my_colors=c(CTCF="blue",RAD21="purple",TOP2B="red",p53="violet",Input_P53="pink")
+pd <- position_dodge(width = 0.75)
+```
+
+```{r}
+
+Mapping_stats_combo %>% 
+  ggplot(aes(x=sample_name, y=alignment_rate)) +
+  geom_col(aes(fill=Ab))+
+  theme_bw()+
+  scale_fill_manual(values=my_colors)+
+  ggtitle("Alignment rate by sample")+
+theme(axis.text.x=element_text(vjust= .2,angle=90))
+
+Mapping_stats_combo %>% 
+  ggplot(aes(x=Individual, y=alignment_rate)) +
+  geom_boxplot()+
+  geom_point(aes(color=Ab, size=3))+
+  theme_bw()+
+  facet_wrap(~Tx)+
+  scale_color_manual(values=my_colors)+
+  ggtitle("Alignment rate by individual")
+   
+Mapping_stats_combo %>% 
+  ggplot(aes(x=Tx, y=alignment_rate)) +
+  geom_boxplot()+
+  geom_point(aes(color=Individual, size=3))+
+  theme_bw()+
+  facet_wrap(~Ab)+
+  ggtitle("Alignment for each individual by treatment")
+
+
+```
+```{r}
+Mapping_stats_combo %>% 
+  ggplot(aes(x=sample_name, y=concord_1_pct)) +
+  geom_col(aes(fill=Ab))+
+  theme_bw()+
+  scale_fill_manual(values=my_colors)+
+  ggtitle("Percent concordantly mapping 1 time by sample")+
+theme(axis.text.x=element_text(vjust= .2,angle=90))
+
+
+Mapping_stats_combo %>% 
+  ggplot(aes(x=Individual, y=concord_1_pct)) +
+  geom_boxplot()+
+  geom_point(aes(color=Ab, size=3))+
+  theme_bw()+
+  facet_wrap(~Tx)+
+  scale_color_manual(values=my_colors)+
+  ggtitle("Percent concordantly mapping 1 time by individual")
+   
+Mapping_stats_combo %>% 
+  ggplot(aes(x=Tx, y=concord_1_pct)) +
+  geom_boxplot()+
+  geom_point(aes(color=Individual, size=3))+
+  theme_bw()+
+  facet_wrap(~Ab)+
+  ggtitle("Percent concordantly mapping 1 time each individual\nby treatment")
+```
+
