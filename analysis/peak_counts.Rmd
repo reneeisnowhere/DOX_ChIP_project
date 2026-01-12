@@ -1,0 +1,80 @@
+---
+title: "Peak counts"
+author: "Renee Matthews"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE,
+	dev = c("png","pdf")
+)
+```
+
+```{css, echo=FALSE}
+pre {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 400px;
+}
+```
+
+
+```{r}
+library(tidyverse)
+library(readr)
+```
+
+```{r loading mapping stat files}
+DOX_ChIP_samplenames <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/DOX_ChIP_samplenames.txt", 
+    delim = "\t", escape_double = FALSE, 
+    trim_ws = TRUE)
+
+final_Peak_counts <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/final_Peak_counts.tsv", 
+    delim = "\t", escape_double = FALSE, 
+    trim_ws = TRUE) 
+
+
+tidy_peak_counts <- final_Peak_counts %>% 
+ tidyr::extract(file,  into = c("Sample", "Tx", "Ab", "Individual", "qval"),
+    regex = "^(.*)_(VEH|DOX)_([^_]+)_([^_]+)_(q[^_]+)_peaks\\.narrowPeak$") 
+
+  
+
+```
+
+```{r, tidy peaks, fig.height=8, fig.width=5}
+pd <- position_dodge(0.75)
+
+tidy_peak_counts %>% 
+   mutate(Tx=factor(Tx, levels = c("VEH","DOX")),
+           Ab=factor(Ab, levels = c("TOP2B","p53","CTCF","RAD21"))) %>% 
+    ggplot(aes(x=Tx,y= peak_count))+
+  geom_boxplot(aes(fill=Tx),position = pd) +
+  geom_point(aes(color = Individual, group = Tx),
+             position = pd, size = 2)+
+ facet_grid(Ab~qval, scales="free",drop = TRUE)+
+# facet_wrap(~ Ab + qval, scales = "free_y", drop = TRUE)+
+  theme(strip.text = element_text(face = "bold",  hjust = 0, size = 8),
+        strip.background = element_rect(fill = "white", linetype = "solid",
+                                        color = "black", linewidth = 1),
+        panel.spacing = unit(1, 'points'),
+        axis.text.x=element_text(angle = 90, vjust = 0.5, hjust=1))+
+  ggtitle("Peak call number by q value")
+
+tidy_peak_counts %>% 
+  pivot_wider(., id_cols = c(Sample:Individual), names_from = "qval",values_from = "peak_count") %>% 
+kableExtra::kable(.,caption = "Peak counts for DOX ChIP") %>% 
+   kableExtra::kable_paper("striped", full_width = TRUE) %>%
+  kableExtra::kable_styling(full_width = FALSE, font_size = 14) %>% 
+  kableExtra::scroll_box(width = "100%", height = "400px")
+  
+
+```
+
