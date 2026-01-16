@@ -11,7 +11,7 @@
 
 <meta name="author" content="Renee Matthews" />
 
-<meta name="date" content="2025-12-02" />
+<meta name="date" content="2026-01-16" />
 
 <title>DOX_seq_QC</title>
 
@@ -353,7 +353,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">DOX_seq_QC</h1>
 <h4 class="author">Renee Matthews</h4>
-<h4 class="date">2025-12-02</h4>
+<h4 class="date">2026-01-16</h4>
 
 </div>
 
@@ -382,7 +382,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-12-02
+<strong>Last updated:</strong> 2026-01-16
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -513,15 +513,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomreneeisnowhereDOXChIPprojecttree5fecce6d0ebd726141b031644c8521b5ff9a61c1targetblank5fecce6a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomreneeisnowhereDOXChIPprojecttreea85847d1efd1d836924044420483181bba5890bctargetblanka85847da">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/tree/5fecce6d0ebd726141b031644c8521b5ff9a61c1" target="_blank">5fecce6</a>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/tree/a85847d1efd1d836924044420483181bba5890bc" target="_blank">a85847d</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomreneeisnowhereDOXChIPprojecttree5fecce6d0ebd726141b031644c8521b5ff9a61c1targetblank5fecce6a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomreneeisnowhereDOXChIPprojecttreea85847d1efd1d836924044420483181bba5890bctargetblanka85847da"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -531,7 +531,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/tree/5fecce6d0ebd726141b031644c8521b5ff9a61c1" target="_blank">5fecce6</a>.
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/tree/a85847d1efd1d836924044420483181bba5890bc" target="_blank">a85847d</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -549,6 +549,15 @@ Ignored files:
     Ignored:    .RData
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    data/peak_counts.log
+    Ignored:    data/peak_counts.pdf
+    Ignored:    data/peak_counts.synctex.gz
+    Ignored:    data/peak_counts.tex
+
+Unstaged changes:
+    Modified:   analysis/bowtie_2_stats.Rmd
+    Modified:   analysis/index.Rmd
+    Modified:   analysis/peak_counts.Rmd
 
 </code></pre>
 <p>
@@ -593,6 +602,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/a85847d1efd1d836924044420483181bba5890bc/analysis/DOX_seq_QC.Rmd" target="_blank">a85847d</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2026-01-16
+</td>
+<td>
+wflow_publish("analysis/DOX_seq_QC.Rmd")
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/reneeisnowhere/DOX_ChIP_project/90590e0f5c4442bd39d37270c93637aa6ed5387c/docs/DOX_seq_QC.html" target="_blank">90590e0</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2025-12-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -786,7 +829,11 @@ pd &lt;- position_dodge(width = 0.75)</code></pre>
 <pre class="r"><code>Lane1_qc &lt;- process_fastqc(Lane1_fastqc,DOX_ChIP_samplenames)
 
 Lane1_qc %&gt;% 
-  ggplot(.,aes(x=Sample_name, y=`Total Sequences` ))+
+  group_by(Sample_name, Ab) %&gt;%
+  summarise(total_seq = sum(`Total Sequences`),
+            Tx=paste0(unique(Tx)),
+            Individual=paste0(unique(Individual)),.groups = &quot;drop&quot;) %&gt;%
+  ggplot(.,aes(x=Sample_name, y=total_seq))+
   geom_col(aes(fill=Ab,group=Ab))+
   theme_bw()+
    theme(axis.text.x=element_text(vjust= .2,angle=90))+
@@ -818,6 +865,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/90590e0f5c4442bd39d37270c93637aa6ed5387c/docs/figure/DOX_seq_QC.Rmd/first run qc-1.png" target="_blank">90590e0</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2025-12-02
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/7e9c3b8c4954a7b6f75d179cd6a7d63a288873ef/docs/figure/DOX_seq_QC.Rmd/first run qc-1.png" target="_blank">7e9c3b8</a>
 </td>
 <td>
@@ -832,7 +890,11 @@ reneeisnowhere
 </div>
 </div>
 <pre class="r"><code>Lane1_qc %&gt;% 
-  ggplot(.,aes(x=Tx, y=`Total Sequences` ))+
+  group_by(Sample_name, Ab) %&gt;%
+  summarise(total_seq = sum(`Total Sequences`),
+            Tx=paste0(unique(Tx)),
+            Individual=paste0(unique(Individual)),.groups = &quot;drop&quot;) %&gt;%
+  ggplot(.,aes(x=Tx, y=total_seq))+
   geom_boxplot(aes(fill=Ab))+
   geom_point(aes(group = Ab), 
              position = pd,
@@ -867,6 +929,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/90590e0f5c4442bd39d37270c93637aa6ed5387c/docs/figure/DOX_seq_QC.Rmd/first run qc-2.png" target="_blank">90590e0</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2025-12-02
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/7e9c3b8c4954a7b6f75d179cd6a7d63a288873ef/docs/figure/DOX_seq_QC.Rmd/first run qc-2.png" target="_blank">7e9c3b8</a>
 </td>
 <td>
@@ -891,6 +964,43 @@ reneeisnowhere
   xlab(&quot;Sample&quot;)+
    scale_fill_manual(values=my_colors, drop = FALSE)</code></pre>
 <p><img src="figure/DOX_seq_QC.Rmd/first%20run%20qc-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-first-run-qc-3">
+Past versions of "first run qc-3.png"
+</button>
+</p>
+<div id="fig-no-spaces-first-run-qc-3" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/90590e0f5c4442bd39d37270c93637aa6ed5387c/docs/figure/DOX_seq_QC.Rmd/first run qc-3.png" target="_blank">90590e0</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2025-12-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>Lane1_qc %&gt;% 
     ggplot(.,aes(x=Tx, y=100-total_deduplicated_percentage))+
   geom_boxplot(aes(fill=Ab))+
@@ -902,13 +1012,54 @@ reneeisnowhere
   xlab(&quot;Treatment&quot;)+
   scale_fill_manual(values=my_colors, drop = FALSE)</code></pre>
 <p><img src="figure/DOX_seq_QC.Rmd/first%20run%20qc-4.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-first-run-qc-4">
+Past versions of "first run qc-4.png"
+</button>
+</p>
+<div id="fig-no-spaces-first-run-qc-4" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/90590e0f5c4442bd39d37270c93637aa6ed5387c/docs/figure/DOX_seq_QC.Rmd/first run qc-4.png" target="_blank">90590e0</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2025-12-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="second-run-qc" class="section level3">
 <h3>Second Run QC</h3>
 <pre class="r"><code>Lane2_qc &lt;- process_fastqc(Lane2_fastqc,DOX_ChIP_samplenames)
 
 Lane2_qc %&gt;% 
-  ggplot(.,aes(x=Sample_name, y=`Total Sequences`))+
+  group_by(Sample_name, Ab) %&gt;%
+  summarise(total_seq = sum(`Total Sequences`),
+            Tx=paste0(unique(Tx)),
+            Individual=paste0(unique(Individual)),.groups = &quot;drop&quot;) %&gt;%
+  ggplot(.,aes(x=Sample_name, y=total_seq))+
   geom_col(aes(fill=Ab,group=Ab))+
   theme_bw()+
    theme(axis.text.x=element_text(vjust= .2,angle=90))+
@@ -940,6 +1091,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/90590e0f5c4442bd39d37270c93637aa6ed5387c/docs/figure/DOX_seq_QC.Rmd/second run qc-1.png" target="_blank">90590e0</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2025-12-02
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/7e9c3b8c4954a7b6f75d179cd6a7d63a288873ef/docs/figure/DOX_seq_QC.Rmd/second run qc-1.png" target="_blank">7e9c3b8</a>
 </td>
 <td>
@@ -954,7 +1116,11 @@ reneeisnowhere
 </div>
 </div>
 <pre class="r"><code>Lane2_qc %&gt;% 
-  ggplot(.,aes(x=Tx, y=`Total Sequences` ))+
+  group_by(Sample_name, Ab) %&gt;%
+   summarise(total_seq = sum(`Total Sequences`),
+            Tx=paste0(unique(Tx)),
+            Individual=paste0(unique(Individual)),.groups = &quot;drop&quot;) %&gt;%
+  ggplot(.,aes(x=Tx, y=total_seq))+
   geom_boxplot(aes(fill=Ab))+
   geom_point(aes(group = Ab), 
              position = pd,
@@ -989,6 +1155,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/90590e0f5c4442bd39d37270c93637aa6ed5387c/docs/figure/DOX_seq_QC.Rmd/second run qc-2.png" target="_blank">90590e0</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2025-12-02
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/7e9c3b8c4954a7b6f75d179cd6a7d63a288873ef/docs/figure/DOX_seq_QC.Rmd/second run qc-2.png" target="_blank">7e9c3b8</a>
 </td>
 <td>
@@ -1013,6 +1190,43 @@ reneeisnowhere
   xlab(&quot;Sample&quot;)+
    scale_fill_manual(values=my_colors, drop = FALSE)</code></pre>
 <p><img src="figure/DOX_seq_QC.Rmd/second%20run%20qc-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-second-run-qc-3">
+Past versions of "second run qc-3.png"
+</button>
+</p>
+<div id="fig-no-spaces-second-run-qc-3" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/90590e0f5c4442bd39d37270c93637aa6ed5387c/docs/figure/DOX_seq_QC.Rmd/second run qc-3.png" target="_blank">90590e0</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2025-12-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>Lane2_qc %&gt;% 
     ggplot(.,aes(x=Tx, y=100-total_deduplicated_percentage))+
   geom_boxplot(aes(fill=Ab))+
@@ -1024,13 +1238,54 @@ reneeisnowhere
   xlab(&quot;Treatment&quot;)+
   scale_fill_manual(values=my_colors, drop = FALSE)</code></pre>
 <p><img src="figure/DOX_seq_QC.Rmd/second%20run%20qc-4.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-second-run-qc-4">
+Past versions of "second run qc-4.png"
+</button>
+</p>
+<div id="fig-no-spaces-second-run-qc-4" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/90590e0f5c4442bd39d37270c93637aa6ed5387c/docs/figure/DOX_seq_QC.Rmd/second run qc-4.png" target="_blank">90590e0</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2025-12-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="merged-runs-qc" class="section level3">
 <h3>Merged Runs QC</h3>
 <pre class="r"><code>Merge_qc &lt;- process_fastqc(Merged_fastqc,DOX_ChIP_samplenames)
 
 Merge_qc %&gt;% 
-  ggplot(.,aes(x=Sample_name, y=`Total Sequences`))+
+  group_by(Sample_name, Ab) %&gt;%
+   summarise(total_seq = sum(`Total Sequences`),
+            Tx=paste0(unique(Tx)),
+            Individual=paste0(unique(Individual)),.groups = &quot;drop&quot;) %&gt;%
+  ggplot(.,aes(x=Sample_name, y=total_seq))+
   geom_col(aes(fill=Ab))+
   theme_bw()+
    theme(axis.text.x=element_text(vjust= .2,angle=90))+
@@ -1062,6 +1317,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/90590e0f5c4442bd39d37270c93637aa6ed5387c/docs/figure/DOX_seq_QC.Rmd/Merged run qc-1.png" target="_blank">90590e0</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2025-12-02
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/7e9c3b8c4954a7b6f75d179cd6a7d63a288873ef/docs/figure/DOX_seq_QC.Rmd/Merged run qc-1.png" target="_blank">7e9c3b8</a>
 </td>
 <td>
@@ -1076,7 +1342,11 @@ reneeisnowhere
 </div>
 </div>
 <pre class="r"><code>Merge_qc %&gt;% 
-  ggplot(.,aes(x=Tx, y=`Total Sequences` ))+
+  group_by(Sample_name, Ab) %&gt;%
+   summarise(total_seq = sum(`Total Sequences`),
+            Tx=paste0(unique(Tx)),
+            Individual=paste0(unique(Individual)),.groups = &quot;drop&quot;) %&gt;%
+  ggplot(.,aes(x=Tx, y=total_seq))+
   geom_boxplot(aes(fill=Ab))+
   geom_point(aes(group = Ab), 
              position = pd,
@@ -1111,6 +1381,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/90590e0f5c4442bd39d37270c93637aa6ed5387c/docs/figure/DOX_seq_QC.Rmd/Merged run qc-2.png" target="_blank">90590e0</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2025-12-02
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/7e9c3b8c4954a7b6f75d179cd6a7d63a288873ef/docs/figure/DOX_seq_QC.Rmd/Merged run qc-2.png" target="_blank">7e9c3b8</a>
 </td>
 <td>
@@ -1135,6 +1416,43 @@ reneeisnowhere
   xlab(&quot;Sample&quot;)+
   scale_fill_manual(values=my_colors, drop = FALSE)</code></pre>
 <p><img src="figure/DOX_seq_QC.Rmd/Merged%20run%20qc-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-Merged-run-qc-3">
+Past versions of "Merged run qc-3.png"
+</button>
+</p>
+<div id="fig-no-spaces-Merged-run-qc-3" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/90590e0f5c4442bd39d37270c93637aa6ed5387c/docs/figure/DOX_seq_QC.Rmd/Merged run qc-3.png" target="_blank">90590e0</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2025-12-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>Merge_qc %&gt;% 
     ggplot(.,aes(x=Tx, y=100-total_deduplicated_percentage))+
   geom_boxplot(aes(fill=Ab))+
@@ -1146,36 +1464,85 @@ reneeisnowhere
   xlab(&quot;Treatment&quot;)+
   scale_fill_manual(values=my_colors, drop = FALSE)</code></pre>
 <p><img src="figure/DOX_seq_QC.Rmd/Merged%20run%20qc-4.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-Merged-run-qc-4">
+Past versions of "Merged run qc-4.png"
+</button>
+</p>
+<div id="fig-no-spaces-Merged-run-qc-4" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/90590e0f5c4442bd39d37270c93637aa6ed5387c/docs/figure/DOX_seq_QC.Rmd/Merged run qc-4.png" target="_blank">90590e0</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2025-12-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>Merge_qc %&gt;% 
-  group_by(Ab) %&gt;% 
+  group_by(Ab, read) %&gt;% 
   summarise(
     max_seq  = max(`Total Sequences`, na.rm = TRUE),
     mean_seq = mean(`Total Sequences`, na.rm = TRUE),
     min_seq = min(`Total Sequences`,na.rm = TRUE)
   )</code></pre>
-<pre><code># A tibble: 5 × 4
-  Ab          max_seq  mean_seq  min_seq
-  &lt;fct&gt;         &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-1 CTCF      142698945 89918400. 64890432
-2 RAD21      71844706 67163154  57974542
-3 TOP2B      95864879 73056058. 29808579
-4 p53       118641080 93123534. 70386997
-5 Input_P53  30828399 25264284. 13903613</code></pre>
+<pre><code># A tibble: 10 × 5
+# Groups:   Ab [5]
+   Ab        read    max_seq  mean_seq  min_seq
+   &lt;fct&gt;     &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+ 1 CTCF      R1    142698945 89918400. 64890432
+ 2 CTCF      R2    142698945 89918400. 64890432
+ 3 RAD21     R1     71844706 67163154  57974542
+ 4 RAD21     R2     71844706 67163154  57974542
+ 5 TOP2B     R1     95864879 73056058. 29808579
+ 6 TOP2B     R2     95864879 73056058. 29808579
+ 7 p53       R1    118641080 93123534. 70386997
+ 8 p53       R2    118641080 93123534. 70386997
+ 9 Input_P53 R1     30828399 25264284. 13903613
+10 Input_P53 R2     30828399 25264284. 13903613</code></pre>
 <pre class="r"><code>Merge_qc %&gt;% 
-  group_by(Ab) %&gt;% 
+  group_by(Ab, read) %&gt;% 
   summarise(
     max_seq  = max(100-total_deduplicated_percentage, na.rm = TRUE),
     mean_seq = mean(100-total_deduplicated_percentage, na.rm = TRUE),
     min_seq = min(100-total_deduplicated_percentage,na.rm = TRUE)
   )</code></pre>
-<pre><code># A tibble: 5 × 4
-  Ab        max_seq mean_seq min_seq
-  &lt;fct&gt;       &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;
-1 CTCF         83.7    49.1    24.2 
-2 RAD21        53.5    31.0     9.51
-3 TOP2B        84.5    45.7    22.2 
-4 p53          83.3    53.3    23.4 
-5 Input_P53    12.0     3.77    2.14</code></pre>
+<pre><code># A tibble: 10 × 5
+# Groups:   Ab [5]
+   Ab        read  max_seq mean_seq min_seq
+   &lt;fct&gt;     &lt;chr&gt;   &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;
+ 1 CTCF      R1       83.7    52.8    29.9 
+ 2 CTCF      R2       72.6    45.3    24.2 
+ 3 RAD21     R1       53.5    33.5    12.5 
+ 4 RAD21     R2       45.9    28.4     9.51
+ 5 TOP2B     R1       84.5    46.7    24.1 
+ 6 TOP2B     R2       82.0    44.6    22.2 
+ 7 p53       R1       83.3    57.7    30.2 
+ 8 p53       R2       72.1    48.9    23.4 
+ 9 Input_P53 R1       12.0     4.13    2.62
+10 Input_P53 R2       10.1     3.41    2.14</code></pre>
 </div>
 <div id="trimmed-runs-qc" class="section level3">
 <h3>Trimmed Runs QC</h3>
@@ -1193,8 +1560,13 @@ reneeisnowhere
 
 
 
-cutadapt_qc %&gt;% 
-  ggplot(.,aes(x=Sample_name, y=`Total Sequences`))+
+cutadapt_qc %&gt;%
+  group_by(Sample_name, Ab) %&gt;%
+   summarise(total_seq = sum(`Total Sequences`),
+            Tx=paste0(unique(Tx)),
+            Individual=paste0(unique(Individual)),
+            .groups = &quot;drop&quot;) %&gt;%
+  ggplot(.,aes(x=Sample_name, y=total_seq))+
   geom_col(aes(fill=Ab))+
   theme_bw()+
    theme(axis.text.x=element_text(vjust= .2,angle=90))+
@@ -1202,10 +1574,51 @@ cutadapt_qc %&gt;%
   ggtitle(&quot;Number of sequences per sample, R1+R2\nTrimmed Runs&quot;)+
   scale_fill_manual(values=my_colors, drop = FALSE)</code></pre>
 <p><img src="figure/DOX_seq_QC.Rmd/cutadapt%20qc-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-cutadapt-qc-1">
+Past versions of "cutadapt qc-1.png"
+</button>
+</p>
+<div id="fig-no-spaces-cutadapt-qc-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/90590e0f5c4442bd39d37270c93637aa6ed5387c/docs/figure/DOX_seq_QC.Rmd/cutadapt qc-1.png" target="_blank">90590e0</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2025-12-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>cutadapt_qc %&gt;% 
-  ggplot(.,aes(x=Tx, y=`Total Sequences` ))+
+  group_by(Sample_name, Ab) %&gt;%
+   summarise(total_seq = sum(`Total Sequences`),
+            Tx=paste0(unique(Tx)),
+            Individual=paste0(unique(Individual)),.groups = &quot;drop&quot;) %&gt;%
+  ggplot(.,aes(x=Tx, y=total_seq ))+
   geom_boxplot(aes(fill=Ab))+
-  geom_point(aes(group = Ab), 
+  geom_point(aes(group = Ab, colour = Individual), 
              position = pd,
              size = 2, alpha = 0.8) +
   theme_bw()+
@@ -1214,6 +1627,43 @@ cutadapt_qc %&gt;%
   ggtitle(&quot;Number of sequences per sample, R1+R2\nTrimmed Runs&quot;)+
   scale_fill_manual(values=my_colors, drop = FALSE)</code></pre>
 <p><img src="figure/DOX_seq_QC.Rmd/cutadapt%20qc-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-cutadapt-qc-2">
+Past versions of "cutadapt qc-2.png"
+</button>
+</p>
+<div id="fig-no-spaces-cutadapt-qc-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/90590e0f5c4442bd39d37270c93637aa6ed5387c/docs/figure/DOX_seq_QC.Rmd/cutadapt qc-2.png" target="_blank">90590e0</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2025-12-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>cutadapt_qc %&gt;% 
     ggplot(.,aes(x=Sample_name, y=100-total_deduplicated_percentage))+
   geom_col(aes(fill=Ab))+
@@ -1225,6 +1675,43 @@ cutadapt_qc %&gt;%
   xlab(&quot;Sample&quot;)+
   scale_fill_manual(values=my_colors, drop = FALSE)</code></pre>
 <p><img src="figure/DOX_seq_QC.Rmd/cutadapt%20qc-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-cutadapt-qc-3">
+Past versions of "cutadapt qc-3.png"
+</button>
+</p>
+<div id="fig-no-spaces-cutadapt-qc-3" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/90590e0f5c4442bd39d37270c93637aa6ed5387c/docs/figure/DOX_seq_QC.Rmd/cutadapt qc-3.png" target="_blank">90590e0</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2025-12-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>cutadapt_qc %&gt;% 
     ggplot(.,aes(x=Tx, y=100-total_deduplicated_percentage))+
   geom_boxplot(aes(fill=Ab))+
@@ -1236,6 +1723,85 @@ cutadapt_qc %&gt;%
   xlab(&quot;Treatment&quot;)+
   scale_fill_manual(values=my_colors, drop = FALSE)</code></pre>
 <p><img src="figure/DOX_seq_QC.Rmd/cutadapt%20qc-4.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-cutadapt-qc-4">
+Past versions of "cutadapt qc-4.png"
+</button>
+</p>
+<div id="fig-no-spaces-cutadapt-qc-4" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/reneeisnowhere/DOX_ChIP_project/blob/90590e0f5c4442bd39d37270c93637aa6ed5387c/docs/figure/DOX_seq_QC.Rmd/cutadapt qc-4.png" target="_blank">90590e0</a>
+</td>
+<td>
+reneeisnowhere
+</td>
+<td>
+2025-12-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>cutadapt_qc %&gt;% 
+  group_by(Ab, read) %&gt;% 
+  summarise(
+    max_seq  = max(`Total Sequences`, na.rm = TRUE),
+    mean_seq = mean(`Total Sequences`, na.rm = TRUE),
+    min_seq = min(`Total Sequences`,na.rm = TRUE)
+  )</code></pre>
+<pre><code># A tibble: 10 × 5
+# Groups:   Ab [5]
+   Ab        read    max_seq  mean_seq  min_seq
+   &lt;fct&gt;     &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+ 1 CTCF      R1    142698942 89918398. 64890432
+ 2 CTCF      R2    142698942 89918398. 64890432
+ 3 RAD21     R1     71844704 67163153. 57974542
+ 4 RAD21     R2     71844704 67163153. 57974542
+ 5 TOP2B     R1     95864874 73056057. 29808579
+ 6 TOP2B     R2     95864874 73056057. 29808579
+ 7 p53       R1    118641080 93123533. 70386997
+ 8 p53       R2    118641080 93123533. 70386997
+ 9 Input_P53 R1     30828399 25264284. 13903612
+10 Input_P53 R2     30828399 25264284. 13903612</code></pre>
+<pre class="r"><code>cutadapt_qc %&gt;% 
+  group_by(Ab,read) %&gt;% 
+  summarise(
+    max_seq  = max(100-total_deduplicated_percentage, na.rm = TRUE),
+    mean_seq = mean(100-total_deduplicated_percentage, na.rm = TRUE),
+    min_seq = min(100-total_deduplicated_percentage,na.rm = TRUE)
+  )</code></pre>
+<pre><code># A tibble: 10 × 5
+# Groups:   Ab [5]
+   Ab        read  max_seq mean_seq min_seq
+   &lt;fct&gt;     &lt;chr&gt;   &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;
+ 1 CTCF      R1       83.7    52.8    29.9 
+ 2 CTCF      R2       72.6    45.3    24.2 
+ 3 RAD21     R1       53.5    33.5    12.5 
+ 4 RAD21     R2       45.9    28.4     9.51
+ 5 TOP2B     R1       84.5    46.7    24.1 
+ 6 TOP2B     R2       82.0    44.6    22.2 
+ 7 p53       R1       83.3    57.7    30.2 
+ 8 p53       R2       72.1    48.9    23.4 
+ 9 Input_P53 R1       12.0     4.13    2.62
+10 Input_P53 R2       10.1     3.41    2.14</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
