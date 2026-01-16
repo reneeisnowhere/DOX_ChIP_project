@@ -114,3 +114,47 @@ Mapping_stats_combo %>%
   ggtitle("Percent concordantly mapping 1 time each individual\nby treatment")
 ```
 
+```{r plot_reads, fig.height=7, fig.width=8}
+
+
+
+read_count_summary <- read_csv("C:/Users/renee/Other_projects_data/DOX_CHIP/Stat_data/full_summary_read_counts.csv")
+
+final_counts_file <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/Stat_data/final_counts_file.txt", 
+    delim = "\t", escape_double = FALSE, 
+    trim_ws = TRUE)
+read_count_summary %>% 
+  dplyr::select(Sample:Properly_Paired) %>% 
+  left_join(final_counts_file) %>% 
+  left_join(DOX_ChIP_samplenames, by =c("Sample"="Sample name")) %>% 
+    mutate(Tx=factor(Tx, levels = c("VEH","DOX")),
+           Ab=factor(Ab, levels = c("TOP2B","p53","CTCF","RAD21","Input_P53")),
+           Type=factor(Type, levels=c("ChIP_DNA","Input_DNA"))) %>% 
+  pivot_longer(., cols=c(Properly_Paired:noBL), names_to = "read_type", values_to = "R1_R2_counts") %>% 
+  mutate(read_type=factor(read_type,levels=c("Properly_Paired","PropPairedUnique","Nuclear","Dedup","noBL"))) %>% 
+  ggplot(., aes(x=read_type, y=R1_R2_counts))+
+  geom_boxplot(aes(fill=Tx), position=pd)+
+  geom_point(aes(color=Individual,group = Tx),
+             position = pd, size = 2)+
+  facet_wrap(~Ab+Type, scale="free_y")+
+  scale_color_brewer(palette = "Dark2")+
+  theme_bw()+
+  
+  theme(strip.text = element_text(face = "bold",  hjust = 0, size = 8),
+        strip.background = element_rect(fill = "white", linetype = "solid",
+                                        color = "black", linewidth = 1),
+        panel.spacing = unit(1, 'points'),
+        axis.text.x=element_text(angle = 90, vjust = 0.5, hjust=1))
+  
+
+```
+
+
+```{r}
+
+
+blacklist_filter_summary <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/Stat_data/blacklist_filter_summary.tsv", 
+ delim = "\t", escape_double = FALSE, 
+   trim_ws = TRUE)
+```
+
