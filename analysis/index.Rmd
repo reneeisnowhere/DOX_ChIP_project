@@ -12,3 +12,5 @@ Welcome to my investigation of Doxorubicin effects on ChIP for p53 and TOP2b.
 
 
 Initial QC [page](https://reneeisnowhere.github.io/DOX_ChIP_project/DOX_seq_QC.html)
+[Mapping statistics](https://reneeisnowhere.github.io/DOX_ChIP_project/bowtie_2_stats.html)
+[Peak information](https://reneeisnowhere.github.io/DOX_ChIP_project/peak_counts.html)
