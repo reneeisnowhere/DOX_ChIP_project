@@ -84,7 +84,11 @@ pd <- position_dodge(width = 0.75)
 Lane1_qc <- process_fastqc(Lane1_fastqc,DOX_ChIP_samplenames)
 
 Lane1_qc %>% 
-  ggplot(.,aes(x=Sample_name, y=`Total Sequences` ))+
+  group_by(Sample_name, Ab) %>%
+  summarise(total_seq = sum(`Total Sequences`),
+            Tx=paste0(unique(Tx)),
+            Individual=paste0(unique(Individual)),.groups = "drop") %>%
+  ggplot(.,aes(x=Sample_name, y=total_seq))+
   geom_col(aes(fill=Ab,group=Ab))+
   theme_bw()+
    theme(axis.text.x=element_text(vjust= .2,angle=90))+
@@ -93,7 +97,11 @@ Lane1_qc %>%
   scale_fill_manual(values=my_colors, drop = FALSE)
 
 Lane1_qc %>% 
-  ggplot(.,aes(x=Tx, y=`Total Sequences` ))+
+  group_by(Sample_name, Ab) %>%
+  summarise(total_seq = sum(`Total Sequences`),
+            Tx=paste0(unique(Tx)),
+            Individual=paste0(unique(Individual)),.groups = "drop") %>%
+  ggplot(.,aes(x=Tx, y=total_seq))+
   geom_boxplot(aes(fill=Ab))+
   geom_point(aes(group = Ab), 
              position = pd,
@@ -137,7 +145,11 @@ Lane1_qc %>%
 Lane2_qc <- process_fastqc(Lane2_fastqc,DOX_ChIP_samplenames)
 
 Lane2_qc %>% 
-  ggplot(.,aes(x=Sample_name, y=`Total Sequences`))+
+  group_by(Sample_name, Ab) %>%
+  summarise(total_seq = sum(`Total Sequences`),
+            Tx=paste0(unique(Tx)),
+            Individual=paste0(unique(Individual)),.groups = "drop") %>%
+  ggplot(.,aes(x=Sample_name, y=total_seq))+
   geom_col(aes(fill=Ab,group=Ab))+
   theme_bw()+
    theme(axis.text.x=element_text(vjust= .2,angle=90))+
@@ -146,7 +158,11 @@ Lane2_qc %>%
    scale_fill_manual(values=my_colors, drop = FALSE)
 
 Lane2_qc %>% 
-  ggplot(.,aes(x=Tx, y=`Total Sequences` ))+
+  group_by(Sample_name, Ab) %>%
+   summarise(total_seq = sum(`Total Sequences`),
+            Tx=paste0(unique(Tx)),
+            Individual=paste0(unique(Individual)),.groups = "drop") %>%
+  ggplot(.,aes(x=Tx, y=total_seq))+
   geom_boxplot(aes(fill=Ab))+
   geom_point(aes(group = Ab), 
              position = pd,
@@ -189,7 +205,11 @@ Lane2_qc %>%
 Merge_qc <- process_fastqc(Merged_fastqc,DOX_ChIP_samplenames)
 
 Merge_qc %>% 
-  ggplot(.,aes(x=Sample_name, y=`Total Sequences`))+
+  group_by(Sample_name, Ab) %>%
+   summarise(total_seq = sum(`Total Sequences`),
+            Tx=paste0(unique(Tx)),
+            Individual=paste0(unique(Individual)),.groups = "drop") %>%
+  ggplot(.,aes(x=Sample_name, y=total_seq))+
   geom_col(aes(fill=Ab))+
   theme_bw()+
    theme(axis.text.x=element_text(vjust= .2,angle=90))+
@@ -198,7 +218,11 @@ Merge_qc %>%
   scale_fill_manual(values=my_colors, drop = FALSE)
 
 Merge_qc %>% 
-  ggplot(.,aes(x=Tx, y=`Total Sequences` ))+
+  group_by(Sample_name, Ab) %>%
+   summarise(total_seq = sum(`Total Sequences`),
+            Tx=paste0(unique(Tx)),
+            Individual=paste0(unique(Individual)),.groups = "drop") %>%
+  ggplot(.,aes(x=Tx, y=total_seq))+
   geom_boxplot(aes(fill=Ab))+
   geom_point(aes(group = Ab), 
              position = pd,
@@ -237,7 +261,7 @@ Merge_qc %>%
 ```
 ```{r}
 Merge_qc %>% 
-  group_by(Ab) %>% 
+  group_by(Ab, read) %>% 
   summarise(
     max_seq  = max(`Total Sequences`, na.rm = TRUE),
     mean_seq = mean(`Total Sequences`, na.rm = TRUE),
@@ -245,7 +269,7 @@ Merge_qc %>%
   )
 
 Merge_qc %>% 
-  group_by(Ab) %>% 
+  group_by(Ab, read) %>% 
   summarise(
     max_seq  = max(100-total_deduplicated_percentage, na.rm = TRUE),
     mean_seq = mean(100-total_deduplicated_percentage, na.rm = TRUE),
@@ -269,8 +293,13 @@ cutadapt_qc <- cutadapt_fastqc %>%
 
 
 
-cutadapt_qc %>% 
-  ggplot(.,aes(x=Sample_name, y=`Total Sequences`))+
+cutadapt_qc %>%
+  group_by(Sample_name, Ab) %>%
+   summarise(total_seq = sum(`Total Sequences`),
+            Tx=paste0(unique(Tx)),
+            Individual=paste0(unique(Individual)),
+            .groups = "drop") %>%
+  ggplot(.,aes(x=Sample_name, y=total_seq))+
   geom_col(aes(fill=Ab))+
   theme_bw()+
    theme(axis.text.x=element_text(vjust= .2,angle=90))+
@@ -279,9 +308,13 @@ cutadapt_qc %>%
   scale_fill_manual(values=my_colors, drop = FALSE)
 
 cutadapt_qc %>% 
-  ggplot(.,aes(x=Tx, y=`Total Sequences` ))+
+  group_by(Sample_name, Ab) %>%
+   summarise(total_seq = sum(`Total Sequences`),
+            Tx=paste0(unique(Tx)),
+            Individual=paste0(unique(Individual)),.groups = "drop") %>%
+  ggplot(.,aes(x=Tx, y=total_seq ))+
   geom_boxplot(aes(fill=Ab))+
-  geom_point(aes(group = Ab), 
+  geom_point(aes(group = Ab, colour = Individual), 
              position = pd,
              size = 2, alpha = 0.8) +
   theme_bw()+
@@ -317,3 +350,20 @@ cutadapt_qc %>%
 
 ```
 
+```{r}
+cutadapt_qc %>% 
+  group_by(Ab, read) %>% 
+  summarise(
+    max_seq  = max(`Total Sequences`, na.rm = TRUE),
+    mean_seq = mean(`Total Sequences`, na.rm = TRUE),
+    min_seq = min(`Total Sequences`,na.rm = TRUE)
+  )
+
+cutadapt_qc %>% 
+  group_by(Ab,read) %>% 
+  summarise(
+    max_seq  = max(100-total_deduplicated_percentage, na.rm = TRUE),
+    mean_seq = mean(100-total_deduplicated_percentage, na.rm = TRUE),
+    min_seq = min(100-total_deduplicated_percentage,na.rm = TRUE)
+  )
+```
