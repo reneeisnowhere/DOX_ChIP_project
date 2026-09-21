@@ -46,7 +46,12 @@ tidy_peak_counts <- final_Peak_counts %>%
  tidyr::extract(file,  into = c("Sample", "Tx", "Ab", "Individual", "qval"),
     regex = "^(.*)_(VEH|DOX)_([^_]+)_([^_]+)_(q[^_]+)_peaks\\.narrowPeak$") 
 
-  
+
+rerun_Peak_counts <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/final_Peak_counts_second.tsv", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+
+tidy_rerun_peak_counts <- rerun_Peak_counts%>% 
+ tidyr::extract(file,  into = c("Sample", "Tx", "Ab", "Individual", "qval"),
+    regex = "^(.*)_(VEH|DOX)_([^_]+)_([^_]+)_(q[^_]+)_peaks\\.narrowPeak$") 
 
 ```
 
@@ -92,5 +97,154 @@ kableExtra::kable(.,caption = "Peak counts for DOX ChIP") %>%
 #     latex_options = c("hold_position", "scale_down")  # <-- scale_down to fit wide tables
 #   ) %>%
 #   save_kable("data/peak_counts.pdf")
+```
+### second run peak counts
+```{r rerun tidy peaks,fig.height=8, fig.width=5}
+pd <- position_dodge(0.75)
+
+tidy_rerun_peak_counts %>% 
+   mutate(Tx=factor(Tx, levels = c("VEH","DOX")),
+           Ab=factor(Ab, levels = c("TOP2B","p53","CTCF","RAD21"))) %>% 
+    ggplot(aes(x=Tx,y= peak_count))+
+  geom_boxplot(aes(fill=Tx),position = pd) +
+  geom_point(aes(color = Individual, group = Tx),
+             position = pd, size = 2)+
+ facet_grid(Ab~qval, scales="free",drop = TRUE)+
+# facet_wrap(~ Ab + qval, scales = "free_y", drop = TRUE)+
+  theme(strip.text = element_text(face = "bold",  hjust = 0, size = 8),
+        strip.background = element_rect(fill = "white", linetype = "solid",
+                                        color = "black", linewidth = 1),
+        panel.spacing = unit(1, 'points'),
+        axis.text.x=element_text(angle = 90, vjust = 0.5, hjust=1))+
+  ggtitle(" rerun Peak call number by q value")
+
+tidy_rerun_peak_counts %>% 
+  pivot_wider(., id_cols = c(Sample:Individual), names_from = "qval",values_from = "peak_count") %>% 
+kableExtra::kable(.,caption = "Re-run Peak counts for DOX ChIP") %>% 
+   kableExtra::kable_paper("striped", full_width = TRUE) %>%
+  kableExtra::kable_styling(full_width = FALSE, font_size = 14) %>% 
+  kableExtra::scroll_box(width = "100%", height = "400px")
+  
+```
+ side by side:
+```{r}
+
+tidy_peak_counts %>% 
+  left_join(tidy_rerun_peak_counts, by = setdiff(names(tidy_peak_counts), "peak_count"))  %>%  
+  rename("first_peak_counts"=peak_count.x, "second_peak_counts"= peak_count.y)%>% 
+  dplyr::filter(qval=="q0.05") %>% 
+kableExtra::kable(.,caption = "comparison Peak counts for DOX ChIP") %>% 
+     kableExtra::kable_paper("striped", full_width = TRUE) %>%
+  kableExtra::kable_styling(full_width = FALSE, font_size = 14) %>% 
+  kableExtra::scroll_box(width = "100%", height = "500px")
+
+
+```
+
+
+
+```{r before after comparison}
+comparison <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/peak_comparison/peak_overlap_summary.tsv", 
+    delim = "\t", escape_double = FALSE, 
+    trim_ws = TRUE) 
+
+comparison%>% 
+  dplyr::filter(Qvalue=="0.05") %>% 
+kableExtra::kable(.,caption = "comparison Peak counts for DOX ChIP") %>% 
+     kableExtra::kable_paper("striped", full_width = TRUE) %>%
+  kableExtra::kable_styling(full_width = FALSE, font_size = 14) %>% 
+  kableExtra::scroll_box(width = "100%", height = "500px")
+
+
+```
+
+ 
+duplication checks:
+
+```{r}
+
+old_dup <- read.delim("C:/Users/renee/Other_projects_data/DOX_CHIP/Stat_data/duplication_summary.tsv",skip = 1, header = FALSE)
+
+colnames(old_dup) <- c(
+  "Sample",
+  "LIBRARY",
+  "UNPAIRED_READS_EXAMINED",
+  "READ_PAIRS_EXAMINED",
+  "SECONDARY_OR_SUPPLEMENTARY_RDS",
+  "UNMAPPED_READS",
+  "UNPAIRED_READ_DUPLICATES",
+  "READ_PAIR_DUPLICATES",
+  "READ_PAIR_OPTICAL_DUPLICATES",
+  "PERCENT_DUPLICATION",
+  "ESTIMATED_LIBRARY_SIZE")
+
+
+old_dup <- old_dup %>%  mutate(    Sample = str_remove(Sample, "\\.proper_unique$"),
+    Old_dup_percent = PERCENT_DUPLICATION * 100  )
+  
+new_dup <- read.csv("C:/Users/renee/Other_projects_data/DOX_CHIP/second_run/bam_folder/summary_files/all_samples_summary.csv") %>%  mutate(
+    New_dup_percent = Removed_Duplicates / After_Canonical * 100)
+
+dup_compare <- old_dup %>%
+  select(Sample, Old_dup_percent) %>%
+  left_join(
+    new_dup %>%
+      select(Sample, New_dup_percent),
+    by = "Sample"
+  ) %>%
+  mutate(
+    Difference =
+      New_dup_percent - Old_dup_percent
+  )
+
+
+dup_compare %>% 
+  kableExtra::kable(.,caption = "Duplicate comparisons") %>% 
+     kableExtra::kable_paper("striped", full_width = TRUE) %>%
+  kableExtra::kable_styling(full_width = FALSE, font_size = 14) %>% 
+  kableExtra::scroll_box(width = "100%", height = "500px")
+
+```
+```{r}
+ggplot(
+  dup_compare,
+  aes(x = Old_dup_percent,
+      y = New_dup_percent)
+) +
+  geom_point() +
+  geom_abline(
+    slope = 1,
+    intercept = 0,
+    linetype = "dashed"
+  ) +
+  labs(
+    x = "First run duplication (%)",
+    y = "Second rund duplication (%)",
+    title = "Duplicate removal: old vs new runs"
+  ) +
+  theme_classic()
+```
+So what about the number of reads/fragments before peak calling and after blacklist removal
+
+
+```{r}
+
+  
+first_read_counts <- read_delim("C:/Users/renee/Other_projects_data/DOX_CHIP/Stat_data/final_counts_file.txt", 
+    delim = "\t", escape_double = FALSE, 
+    trim_ws = TRUE)
+  
+second_read_counts <- read_csv("C:/Users/renee/Other_projects_data/DOX_CHIP/second_run/bam_folder/summary_files/all_samples_summary.csv")
+
+second_read_counts %>% 
+  dplyr::select(Sample,After_Blacklist)
+
+first_read_counts %>% 
+  dplyr::select(Sample,noBL) %>% 
+  dplyr::rename("first_run_final_fragments"=noBL) %>% 
+  left_join((second_read_counts %>% 
+  dplyr::select(Sample,After_Blacklist)), by="Sample") %>% 
+  mutate(precent_recovered= (1-(After_Blacklist/first_run_final_fragments))*100 )
+  
 ```
 
