@@ -239,12 +239,31 @@ second_read_counts <- read_csv("C:/Users/renee/Other_projects_data/DOX_CHIP/seco
 second_read_counts %>% 
   dplyr::select(Sample,After_Blacklist)
 
+
+  
+```
+
+Number of reads lost overall
+```{r}
 first_read_counts %>% 
   dplyr::select(Sample,noBL) %>% 
-  dplyr::rename("first_run_final_fragments"=noBL) %>% 
+  dplyr::rename("MAPQ1_fin_frag"=noBL) %>% 
   left_join((second_read_counts %>% 
   dplyr::select(Sample,After_Blacklist)), by="Sample") %>% 
-  mutate(precent_recovered= (1-(After_Blacklist/first_run_final_fragments))*100 )
-  
+  mutate(precent_removed= (1-(After_Blacklist/MAPQ1_fin_frag))*100 ) %>% 
+  dplyr::rename("MAPQ30_fin_frag"=After_Blacklist) %>% 
+  kableExtra::kable(.,caption = "Final Fragment comparisions") %>% 
+     kableExtra::kable_paper("striped", full_width = TRUE) %>%
+  kableExtra::kable_styling(full_width = FALSE, font_size = 14) %>% 
+  kableExtra::scroll_box(width = "100%", height = "500px")
+```
+
+
+```{r}
+second_read_counts %>% 
+  kableExtra::kable(.,caption = "Second Run Read counts") %>% 
+     kableExtra::kable_paper("striped", full_width = TRUE) %>%
+  kableExtra::kable_styling(full_width = FALSE, font_size = 14) %>% 
+  kableExtra::scroll_box(width = "100%", height = "500px")
 ```
 
