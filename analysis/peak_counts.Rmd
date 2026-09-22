@@ -261,7 +261,7 @@ first_read_counts %>%
 
 ```{r}
 second_read_counts %>% 
-  kableExtra::kable(.,caption = "Second Run Read counts") %>% 
+  kableExtra::kable(.,caption = "Second Run Read counts (in paired fragments)") %>% 
      kableExtra::kable_paper("striped", full_width = TRUE) %>%
   kableExtra::kable_styling(full_width = FALSE, font_size = 14) %>% 
   kableExtra::scroll_box(width = "100%", height = "500px")
